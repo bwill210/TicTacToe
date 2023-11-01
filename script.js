@@ -7,9 +7,20 @@ const Gameboard = (() => {
             boardHTML += `<div class="square" id="square-${index}">${square}</div>`
         })
         document.querySelector("#gameboard").innerHTML = boardHTML;
+        const squares = document.querySelectorAll('.square');
+        squares.forEach((square) => {
+            square.addEventListener("click", Game.handleClick)
+        });
     };
 
-    return {render,};
+    const update = (index, value) => {
+        gameboard[index] = value;
+        render();
+    }
+
+    const getGameboard = () => gameboard;
+
+        return {render, update, getGameboard};
 })(); 
 
 
@@ -32,7 +43,24 @@ const Game = (() => {
         gameOver = false;
         Gameboard.render();
     }
-    return {start, }; 
+
+    const restart = () => {
+        for (let i = 0; i < 9; i++) {
+            Gameboard.update(i, "");
+        }
+        Gameboard.render();
+    };
+
+    const handleClick = (event) => {
+        let index = parseInt(event.target.id.split("-")[1]);
+        if (Gameboard.getGameboard()[index] !== "")
+        return;
+
+        Gameboard.update(index, players[currentPlayerIndex].marker);
+        currentPlayerIndex = currentPlayerIndex === 0 ? 1 : 0;
+    }
+
+    return {start, restart, handleClick}; 
 })();
 
 
@@ -40,43 +68,11 @@ const Game = (() => {
 const startButton = document.querySelector('#start-button');
 startButton.addEventListener("click", () => {
     Game.start();
-})
+});
 
-/*
-console.log(gameBoard.boardIsFull());
-
-
-
-const player1 = createPlayer('Marc', 'X');
-const player2 = createPlayer('Alice', 'O');
-
-function playGame(player1, player2, gameBoard) {
-    i = 1;
-    while (gameBoard.boardIsFull) {
-        if (i%2 === 1) { //player 1's turn
-            gameBoard.showBoard();
-            console.log(player1.name + '\'s turn');
-            i = prompt('Please enter the row number');
-            j = prompt('Please enter the column number');
-            player1.makeMove(i, j);
-            i++;
-        }
-        else { //player 2's turn
-            gameBoard.showBoard();
-            console.log(player2.name + '\'s turn');
-            i = prompt('Please enter the row number');
-            j = prompt('Please enter the column number');
-            player2.makeMove(i, j);
-            i++;
-        }
-    }
-    return gameBoard.showBoard();
-}
-
-playGame(player1, player2);
+const restartButton = document.querySelector("#restart-button");
+restartButton.addEventListener("click", () => {
+    Game.restart();
+});
 
 
-/*
-
-
-*/
